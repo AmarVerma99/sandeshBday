@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Birthday Poster</title>
+<style>
+  body {
+    background: linear-gradient(135deg, #f9d423, #ff4e50);
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+  }
+  #poster {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 30px 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    max-width: 600px;
+  }
+  #message {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    min-height: 3em;
+    transition: opacity 0.8s ease;
+  }
+  #name {
+    font-weight: bold;
+    font-size: 2.8rem;
+    color: #ffe600;
+    text-shadow: 0 0 8px #fff, 0 0 12px #ffe600;
+  }
+  #confetti {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="poster">
+  <div id="message"></div>
+  <div id="name"></div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+// Birthday messages array
+const messages = [
+  "Hey",
+  "Wishing you a day filled with happiness and a year filled with joy! 🥳",
+  "Happy Birthday! 🎂🎈",
+  "May all your dreams come true! ✨",
+  "Have an amazing celebration! 🎊",
+  "🎉🎉🎉 boooyaaa!!!!!🎉🎉🎉"
+];
+
+const name = "SANDESH"; // Change to your friend's name
+const messageEl = document.getElementById('message');
+const nameEl = document.getElementById('name');
+
+let index = 0;
+
+function showMessage() {
+  messageEl.style.opacity = 0;
+
+  setTimeout(() => {
+    if(index === 0) {
+      messageEl.textContent = messages[index] + ` ${name}! 🎉`;
+      nameEl.textContent = '';
+    } else if(index === 1) {
+      messageEl.textContent = messages[index];
+      nameEl.textContent = '';
+    } else if (index === 5) {
+      messageEl.textContent = '';
+      nameEl.textContent = messages[index];
+      startConfetti();
+    } else {
+      messageEl.textContent = messages[index];
+      nameEl.textContent = '';
+    }
+    messageEl.style.opacity = 1;
+
+    index++;
+    if(index < messages.length) {
+      setTimeout(showMessage, 2000);
+    }
+  }, 800);
+}
+
+showMessage();
+
+
+// Confetti effect code
+const confettiCanvas = document.getElementById('confetti');
+const ctx = confettiCanvas.getContext('2d');
+let confettiPieces = [];
+
+function resizeCanvas() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function randomRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+class Confetti {
+  constructor() {
+    this.x = randomRange(0, confettiCanvas.width);
+    this.y = randomRange(-20, confettiCanvas.height);
+    this.size = randomRange(5, 12);
+    this.speed = randomRange(1, 3);
+    this.angle = randomRange(0, 2 * Math.PI);
+    this.spin = randomRange(0.05, 0.1);
+    this.color = `hsl(${randomRange(0, 360)}, 70%, 60%)`;
+  }
+  update() {
+    this.y += this.speed;
+    this.angle += this.spin;
+    if (this.y > confettiCanvas.height) this.y = -10;
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size * 0.4);
+    ctx.restore();
+  }
+}
+
+function createConfetti() {
+  for(let i = 0; i < 150; i++) {
+    confettiPieces.push(new Confetti());
+  }
+}
+
+function updateConfetti() {
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiPieces.forEach(piece => {
+    piece.update();
+    piece.draw();
+  });
+  requestAnimationFrame(updateConfetti);
+}
+
+function startConfetti() {
+  createConfetti();
+  updateConfetti();
+}
+
+</script>
+
+</body>
+</html>
